@@ -1,8 +1,0 @@
-spring:
-  profiles:
-    activate:
-      on-profile:dev
-
-logging:
-  level:
-    com.example.qacommunity: debug
