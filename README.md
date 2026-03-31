@@ -4,57 +4,94 @@
 一个类似知乎/Stack Overflow的简易问答社区后端服务，支持用户管理、问题发布、回答、评论等核心功能。
 
 ## 技术栈
-- Spring Boot 3.2.x
+- Spring Boot 4.0.3
 - MyBatis
 - MySQL 8.0+
 - JWT 认证
 - Lombok
 - Maven
 
-
-### 1. 环境准备（Day1）
+## 环境准备
 - JDK 17+
 - MySQL 8.0+
 - Maven 3.6+
 
-### 2. 初始化数据库(Day1)
-mysql -u root -p < ../doc/db_design/schema.sql
+## 初始化数据库
+```bash
+mysql -u root -p < doc/db_design/schema.sql
+```
 
-### 3. 修改配置文件
+## 配置
 编辑 `src/main/resources/application.yml`，修改数据库连接信息：
-yaml
+```yaml
 spring:
-datasource:
-url: jdbc:mysql://localhost:3306/qa_community?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true&characterEncoding=utf8
-username: your_mysql_username
-password: your_mysql_password
+  datasource:
+    url: jdbc:mysql://localhost:3306/qa_community?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true&characterEncoding=utf8
+    username: root
+    password: your_mysql_password
+```
 
-### 4.完成接口
-
-### 5. 运行项目
+## 运行项目
+```bash
 mvn spring-boot:run
+```
 
-### 6. 测试接口
-使用 Postman 或 curl 测试：
-    注册用户，登录用户功能正常
+## 接口文档
+测试文件：`doc/postman/QA_Community_Day3.postman_collection.json`
 
-## 当前进度 (Day 2)2026-3-18
-✅ 完成 Spring Boot 项目初始化  
-✅ 完成数据库配置  
-✅ 实现用户实体与 Mapper  
-✅ 实现统一响应格式与全局异常处理  
-✅ 实现用户注册接口（含参数校验、密码加密）  
-✅ 实现用户登录接口（JWT 认证）  
-✅ 完成接口测试
+## 已完成功能
 
-## 2026-3-19
-DAY 3
-任务清单：实现核心业务CRUD
-1.问题部分
-（1）.发布问题（带标签）
-（2）.分页查询问题列表（时间排序）
-（3）.查看详细问题
-2.回答部分
-（1）针对问题发布回答
-（2）查询所有回答
-3.测试
+### Part 1 - 数据库设计
+- ✅ 完成三层嵌套结构的数据库建模（Question-Answer-Comment）
+- ✅ 设计合理的索引策略优化查询性能
+- ✅ 通过级联删除确保数据一致性
+- ✅ 使用 utf8mb4 字符集支持国际化内容
+
+### Part 2 - 用户模块
+- ✅ 完成 Spring Boot 项目初始化
+- ✅ 实现用户实体与 Mapper
+- ✅ 实现统一响应格式与全局异常处理
+- ✅ 实现用户注册接口（含参数校验、密码加密）
+- ✅ 实现用户登录接口（JWT 认证）
+
+### Part 3 - 问题与回答模块
+- ✅ 实现问题发布接口（需登录）
+- ✅ 实现问题列表接口（分页查询）
+- ✅ 实现问题详情接口
+- ✅ 实现按标签查询接口
+- ✅ 实现回答发布接口（需登录）
+- ✅ 实现回答列表接口（分页查询）
+- ✅ 支持关联数据加载（用户名）
+
+## 接口列表
+
+| 接口 | 方法 | 说明 | 认证 |
+|------|------|------|------|
+| `/api/user/register` | POST | 用户注册 | 否 |
+| `/api/user/login` | POST | 用户登录 | 否 |
+| `/api/question` | POST | 发布问题 | 是 |
+| `/api/question/list` | GET | 问题列表（分页） | 否 |
+| `/api/question/{id}` | GET | 问题详情 | 否 |
+| `/api/question/tag/{tag}` | GET | 按标签查询 | 否 |
+| `/api/answer` | POST | 发布回答 | 是 |
+| `/api/answer/list/{questionId}` | GET | 回答列表（分页） | 否 |
+
+## 项目结构
+```
+src/main/java/com/example/qacommunity/
+├── common/          # 通用类（Result, ResultCode, PageResult）
+├── config/          # 配置类（JwtConfig）
+├── controller/      # 控制器（User, Question, Answer）
+├── entity/          # 实体类（User, Question, Answer）
+├── exception/       # 异常处理
+├── mapper/          # MyBatis Mapper接口
+├── service/         # 业务逻辑接口及实现
+├── util/            # 工具类（JwtUtil）
+└── vo/              # 视图对象（QuestionVO, AnswerVO）
+```
+
+## 待完成功能
+- [ ] Day 4 - 评论模块与内容审核
+- [ ] Day 5 - 热榜排序与定时任务
+- [ ] Day 6 - Redis缓存优化
+- [ ] Day 7 - Elasticsearch搜索（可选）

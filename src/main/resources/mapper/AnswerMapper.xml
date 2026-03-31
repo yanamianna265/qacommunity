@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.qacommunity.mapper.AnswerMapper">
+
+    <resultMap id="BaseResultMap" type="Answer">
+        <id column="answer_id" property="answerId"/>
+        <result column="content" property="content"/>
+        <result column="question_id" property="questionId"/>
+        <result column="user_id" property="userId"/>
+        <result column="created_at" property="createdAt"/>
+    </resultMap>
+
+    <resultMap id="VOResultMap" type="AnswerVO">
+        <id column="answer_id" property="answerId"/>
+        <result column="content" property="content"/>
+        <result column="question_id" property="questionId"/>
+        <result column="user_id" property="userId"/>
+        <result column="username" property="username"/>
+        <result column="created_at" property="createdAt"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="Answer" useGeneratedKeys="true" keyProperty="answerId">
+        INSERT INTO answer (content, question_id, user_id, created_at)
+        VALUES (#{content}, #{questionId}, #{userId}, #{createdAt})
+    </insert>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT * FROM answer WHERE answer_id = #{answerId}
+    </select>
+
+    <select id="selectByQuestionId" resultMap="VOResultMap">
+        SELECT a.answer_id, a.content, a.question_id, a.user_id, u.username, a.created_at
+        FROM answer a
+        LEFT JOIN user u ON a.user_id = u.user_id
+        WHERE a.question_id = #{questionId}
+        ORDER BY a.created_at DESC
+        LIMIT #{offset}, #{limit}
+    </select>
+
+    <select id="countByQuestionId" resultType="long">
+        SELECT COUNT(*) FROM answer WHERE question_id = #{questionId}
+    </select>
+
+</mapper>

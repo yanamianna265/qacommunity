@@ -1,0 +1,218 @@
+{
+	"info": {
+		"_postman_id": "qa-community-day3",
+		"name": "QA Community API - Day3",
+		"description": "简易问答社区 Day3 问题&回答模块接口测试用例",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080"
+		},
+		{
+			"key": "token",
+			"value": ""
+		}
+	],
+	"item": [
+		{
+			"name": "Step 0 - 登录获取Token",
+			"item": [
+				{
+					"name": "登录获取Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if(jsonData.code === 200 && jsonData.data) {",
+									"    pm.collectionVariables.set('token', 'Bearer ' + jsonData.data);",
+									"    tests['获取Token成功'] = true;",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/user/login?username=alice&password=123456",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "user", "login"],
+							"query": [
+								{"key": "username", "value": "alice"},
+								{"key": "password", "value": "123456"}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "问题模块",
+			"item": [
+				{
+					"name": "1. 发布问题 - 成功",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Authorization", "value": "{{token}}"}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/question?title=Spring Boot如何自定义配置？&content=我想了解如何在Spring Boot中自定义配置类&tag=Spring Boot",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "question"],
+							"query": [
+								{"key": "title", "value": "Spring Boot如何自定义配置？"},
+								{"key": "content", "value": "我想了解如何在Spring Boot中自定义配置类"},
+								{"key": "tag", "value": "Spring Boot"}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "2. 发布问题 - 未登录",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/question?title=测试问题&content=测试内容",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "question"],
+							"query": [
+								{"key": "title", "value": "测试问题"},
+								{"key": "content", "value": "测试内容"}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "3. 问题列表（分页）",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/question/list?page=1&size=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "question", "list"],
+							"query": [
+								{"key": "page", "value": "1"},
+								{"key": "size", "value": "10"}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "4. 问题详情",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/question/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "question", "1"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "5. 问题详情 - 不存在",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/question/99999",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "question", "99999"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "6. 按标签查询",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/question/tag/Java?page=1&size=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "question", "tag", "Java"],
+							"query": [
+								{"key": "page", "value": "1"},
+								{"key": "size", "value": "10"}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "回答模块",
+			"item": [
+				{
+					"name": "7. 发布回答 - 成功",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Authorization", "value": "{{token}}"}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/answer?questionId=1&content=可以使用@Configuration注解来创建配置类，然后在类中定义@Bean方法。",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "answer"],
+							"query": [
+								{"key": "questionId", "value": "1"},
+								{"key": "content", "value": "可以使用@Configuration注解来创建配置类，然后在类中定义@Bean方法。"}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "8. 发布回答 - 问题不存在",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Authorization", "value": "{{token}}"}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/answer?questionId=99999&content=这是一个回答",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "answer"],
+							"query": [
+								{"key": "questionId", "value": "99999"},
+								{"key": "content", "value": "这是一个回答"}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "9. 回答列表",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/answer/list/1?page=1&size=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "answer", "list", "1"],
+							"query": [
+								{"key": "page", "value": "1"},
+								{"key": "size", "value": "10"}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

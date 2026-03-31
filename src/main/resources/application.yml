@@ -12,7 +12,7 @@ spring:
 
 mybatis:
   mapper-locations: classpath:mapper/*.xml
-  type-aliases-package: com.example.qacommunity.entity
+  type-aliases-package: com.example.qacommunity.entity,com.example.qacommunity.vo
   configuration:
     map-underscore-to-camel-case: true
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
