@@ -1,0 +1,186 @@
+{
+	"info": {
+		"_postman_id": "qa-community-day4",
+		"name": "QA Community API - Day4",
+		"description": "简易问答社区 Day4 评论模块&内容审核接口测试用例",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080"
+		},
+		{
+			"key": "token",
+			"value": ""
+		}
+	],
+	"item": [
+		{
+			"name": "Step 0 - 登录获取Token",
+			"item": [
+				{
+					"name": "登录获取Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if(jsonData.code === 200 && jsonData.data) {",
+									"    pm.collectionVariables.set('token', 'Bearer ' + jsonData.data);",
+									"    tests['获取Token成功'] = true;",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/user/login?username=alice&password=123456",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "user", "login"],
+							"query": [
+								{"key": "username", "value": "alice"},
+								{"key": "password", "value": "123456"}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "评论模块",
+			"item": [
+				{
+					"name": "1. 发布评论 - 成功",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Authorization", "value": "{{token}}"}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/comment?answerId=1&content=这个回答很有帮助，感谢分享！",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "comment"],
+							"query": [
+								{"key": "answerId", "value": "1"},
+								{"key": "content", "value": "这个回答很有帮助，感谢分享！"}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "2. 发布评论 - 回答不存在",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Authorization", "value": "{{token}}"}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/comment?answerId=99999&content=测试评论",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "comment"],
+							"query": [
+								{"key": "answerId", "value": "99999"},
+								{"key": "content", "value": "测试评论"}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "3. 发布评论 - 未登录",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/comment?answerId=1&content=测试评论",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "comment"],
+							"query": [
+								{"key": "answerId", "value": "1"},
+								{"key": "content", "value": "测试评论"}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "4. 评论列表",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/comment/list/1?page=1&size=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "comment", "list", "1"],
+							"query": [
+								{"key": "page", "value": "1"},
+								{"key": "size", "value": "10"}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "内容审核模块",
+			"item": [
+				{
+					"name": "5. 内容审核 - 正常内容",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/moderation/check?content=这是一个正常的讨论内容",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "moderation", "check"],
+							"query": [
+								{"key": "content", "value": "这是一个正常的讨论内容"}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "6. 内容审核 - 包含敏感词",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/moderation/check?content=这个人是白痴",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "moderation", "check"],
+							"query": [
+								{"key": "content", "value": "这个人是白痴"}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "7. 内容审核 - 英文敏感词",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/moderation/check?content=this is shit",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "moderation", "check"],
+							"query": [
+								{"key": "content", "value": "this is shit"}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

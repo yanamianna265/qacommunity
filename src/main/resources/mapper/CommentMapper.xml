@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.qacommunity.mapper.CommentMapper">
+
+    <resultMap id="BaseResultMap" type="Comment">
+        <id column="comment_id" property="commentId"/>
+        <result column="content" property="content"/>
+        <result column="answer_id" property="answerId"/>
+        <result column="user_id" property="userId"/>
+        <result column="created_at" property="createdAt"/>
+    </resultMap>
+
+    <resultMap id="VOResultMap" type="CommentVO">
+        <id column="comment_id" property="commentId"/>
+        <result column="content" property="content"/>
+        <result column="answer_id" property="answerId"/>
+        <result column="user_id" property="userId"/>
+        <result column="username" property="username"/>
+        <result column="created_at" property="createdAt"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="Comment" useGeneratedKeys="true" keyProperty="commentId">
+        INSERT INTO comment (content, answer_id, user_id, created_at)
+        VALUES (#{content}, #{answerId}, #{userId}, #{createdAt})
+    </insert>
+
+    <select id="selectByAnswerId" resultMap="VOResultMap">
+        SELECT c.comment_id, c.content, c.answer_id, c.user_id, u.username, c.created_at
+        FROM comment c
+        LEFT JOIN user u ON c.user_id = u.user_id
+        WHERE c.answer_id = #{answerId}
+        ORDER BY c.created_at DESC
+        LIMIT #{offset}, #{limit}
+    </select>
+
+    <select id="countByAnswerId" resultType="long">
+        SELECT COUNT(*) FROM comment WHERE answer_id = #{answerId}
+    </select>
+
+</mapper>

@@ -12,7 +12,8 @@ public enum ResultCode {
     USER_NOT_FOUND(404, "用户不存在"),
     PASSWORD_ERROR(401, "密码错误"),
     QUESTION_NOT_FOUND(404, "问题不存在"),
-    ANSWER_NOT_FOUND(404, "回答不存在");
+    ANSWER_NOT_FOUND(404, "回答不存在"),
+    COMMENT_NOT_FOUND(404, "评论不存在");
 
     private final Integer code;
     private final String message;

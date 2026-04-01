@@ -37,24 +37,24 @@ mvn spring-boot:run
 ```
 
 ## 接口文档
-测试文件：`doc/postman/QA_Community_Day3.postman_collection.json`
+测试文件：`doc/postman/`
 
 ## 已完成功能
 
-### Part 1 - 数据库设计
+### Day 1 - 数据库设计
 - ✅ 完成三层嵌套结构的数据库建模（Question-Answer-Comment）
 - ✅ 设计合理的索引策略优化查询性能
 - ✅ 通过级联删除确保数据一致性
 - ✅ 使用 utf8mb4 字符集支持国际化内容
 
-### Part 2 - 用户模块
+### Day 2 - 用户模块
 - ✅ 完成 Spring Boot 项目初始化
 - ✅ 实现用户实体与 Mapper
 - ✅ 实现统一响应格式与全局异常处理
 - ✅ 实现用户注册接口（含参数校验、密码加密）
 - ✅ 实现用户登录接口（JWT 认证）
 
-### Part 3 - 问题与回答模块
+### Day 3 - 问题与回答模块
 - ✅ 实现问题发布接口（需登录）
 - ✅ 实现问题列表接口（分页查询）
 - ✅ 实现问题详情接口
@@ -62,6 +62,12 @@ mvn spring-boot:run
 - ✅ 实现回答发布接口（需登录）
 - ✅ 实现回答列表接口（分页查询）
 - ✅ 支持关联数据加载（用户名）
+
+### Day 4 - 评论模块与内容审核
+- ✅ 实现评论发布接口（需登录）
+- ✅ 实现评论列表接口（分页查询）
+- ✅ 实现内容审核服务（敏感词过滤）
+- ✅ 支持中英文敏感词检测
 
 ## 接口列表
 
@@ -75,23 +81,30 @@ mvn spring-boot:run
 | `/api/question/tag/{tag}` | GET | 按标签查询 | 否 |
 | `/api/answer` | POST | 发布回答 | 是 |
 | `/api/answer/list/{questionId}` | GET | 回答列表（分页） | 否 |
+| `/api/comment` | POST | 发布评论 | 是 |
+| `/api/comment/list/{answerId}` | GET | 评论列表（分页） | 否 |
+| `/api/moderation/check` | POST | 敏感词检测 | 否 |
 
 ## 项目结构
 ```
 src/main/java/com/example/qacommunity/
 ├── common/          # 通用类（Result, ResultCode, PageResult）
 ├── config/          # 配置类（JwtConfig）
-├── controller/      # 控制器（User, Question, Answer）
-├── entity/          # 实体类（User, Question, Answer）
+├── controller/      # 控制器（User, Question, Answer, Comment, Moderation）
+├── entity/          # 实体类（User, Question, Answer, Comment）
 ├── exception/       # 异常处理
 ├── mapper/          # MyBatis Mapper接口
 ├── service/         # 业务逻辑接口及实现
 ├── util/            # 工具类（JwtUtil）
-└── vo/              # 视图对象（QuestionVO, AnswerVO）
+└── vo/              # 视图对象（QuestionVO, AnswerVO, CommentVO）
 ```
 
 ## 待完成功能
-- [ ] Day 4 - 评论模块与内容审核
 - [ ] Day 5 - 热榜排序与定时任务
 - [ ] Day 6 - Redis缓存优化
 - [ ] Day 7 - Elasticsearch搜索（可选）
+
+## 注意事项
+- Apifox/Postman 测试时注意区分**路径参数**和 **Query 参数**
+- 例如 `/api/comment/list/{answerId}` 中 `{answerId}` 是路径参数
+- 认证接口需要在请求头中添加 `Authorization: Bearer <token>`
