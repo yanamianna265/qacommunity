@@ -3,6 +3,7 @@ package com.example.qacommunity.service.impl;
 import com.example.qacommunity.entity.Question;
 import com.example.qacommunity.mapper.QuestionHotMapper;
 import com.example.qacommunity.mapper.QuestionMapper;
+import com.example.qacommunity.service.CacheService;
 import com.example.qacommunity.service.HotRankService;
 import com.example.qacommunity.vo.HotQuestionVO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,8 +17,10 @@ import java.util.List;
 @Service
 public class HotRankServiceImpl implements HotRankService {
 
+    private static final String HOT_LIST_KEY = "rank:hot:list";
+    private static final long HOT_LIST_EXPIRE = 300;
+
     private static final double ANSWER_WEIGHT = 0.4;
-    private static final double COMMENT_WEIGHT = 0.3;
     private static final double TIME_DECAY_FACTOR = 0.1;
 
     @Autowired
@@ -25,6 +28,9 @@ public class HotRankServiceImpl implements HotRankService {
 
     @Autowired
     private QuestionMapper questionMapper;
+
+    @Autowired
+    private CacheService cacheService;
 
     @Override
     public void calculateAndUpdateHotScores() {
@@ -34,6 +40,8 @@ public class HotRankServiceImpl implements HotRankService {
             Double hotScore = calculateHotScore(hotQuestion.getQuestionId());
             questionHotMapper.insertOrUpdate(hotQuestion.getQuestionId(), hotScore, hotQuestion.getAnswerCount(), 0);
         }
+        
+        cacheService.delete(HOT_LIST_KEY);
     }
 
     @Override
@@ -59,6 +67,17 @@ public class HotRankServiceImpl implements HotRankService {
 
     @Override
     public List<HotQuestionVO> getHotList(Integer limit) {
-        return questionHotMapper.selectHotList(limit);
+        String key = HOT_LIST_KEY + ":" + limit;
+        
+        List<HotQuestionVO> cachedList = cacheService.get(key, new com.fasterxml.jackson.core.type.TypeReference<List<HotQuestionVO>>() {});
+        if (cachedList != null) {
+            return cachedList;
+        }
+        
+        List<HotQuestionVO> list = questionHotMapper.selectHotList(limit);
+        
+        cacheService.set(key, list, HOT_LIST_EXPIRE);
+        
+        return list;
     }
 }
