@@ -1,0 +1,48 @@
+{
+	"info": {
+		"_postman_id": "qa-community-day5",
+		"name": "QA Community API - Day5",
+		"description": "简易问答社区 Day5 热榜排序与定时任务接口测试用例",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "热榜模块",
+			"item": [
+				{
+					"name": "1. 获取热榜列表",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/rank/hot?limit=10",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "rank", "hot"],
+							"query": [
+								{"key": "limit", "value": "10"}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "2. 手动刷新热榜",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/rank/refresh",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "rank", "refresh"]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

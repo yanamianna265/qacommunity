@@ -74,6 +74,19 @@ CREATE TABLE `comment` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='评论表';
 
 -- ----------------------------
+-- 5. 问题热度表 (QuestionHot)
+-- ----------------------------
+DROP TABLE IF EXISTS `question_hot`;
+CREATE TABLE `question_hot` (
+    `question_id` INT UNSIGNED NOT NULL PRIMARY KEY COMMENT '问题ID',
+    `hot_score` DECIMAL(10,2) NOT NULL DEFAULT 0 COMMENT '热度分数',
+    `answer_count` INT NOT NULL DEFAULT 0 COMMENT '回答数量',
+    `view_count` INT NOT NULL DEFAULT 0 COMMENT '浏览量',
+    `last_update_time` BIGINT NOT NULL COMMENT '最后更新时间戳',
+    FOREIGN KEY (`question_id`) REFERENCES `question`(`question_id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='问题热度表';
+
+-- ----------------------------
 -- 初始化测试数据
 -- ----------------------------
 

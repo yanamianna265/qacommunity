@@ -10,6 +10,7 @@
 - JWT 认证
 - Lombok
 - Maven
+- Spring Scheduling（定时任务）
 
 ## 环境准备
 - JDK 17+
@@ -18,7 +19,7 @@
 
 ## 初始化数据库
 ```bash
-mysql -u root -p < doc/db_design/schema.sql
+mysql -u root -p qa_community < doc/db_design/schema.sql
 ```
 
 ## 配置
@@ -69,6 +70,12 @@ mvn spring-boot:run
 - ✅ 实现内容审核服务（敏感词过滤）
 - ✅ 支持中英文敏感词检测
 
+### Day 5 - 热榜排序与定时任务
+- ✅ 实现热榜服务（HotRankService）
+- ✅ 设计并实现热度计算算法
+- ✅ 实现定时任务每小时自动更新热榜
+- ✅ 提供手动刷新热榜接口
+
 ## 接口列表
 
 | 接口 | 方法 | 说明 | 认证 |
@@ -84,23 +91,24 @@ mvn spring-boot:run
 | `/api/comment` | POST | 发布评论 | 是 |
 | `/api/comment/list/{answerId}` | GET | 评论列表（分页） | 否 |
 | `/api/moderation/check` | POST | 敏感词检测 | 否 |
+| `/api/rank/hot` | GET | 获取热榜列表 | 否 |
+| `/api/rank/refresh` | POST | 手动刷新热榜 | 否 |
 
 ## 项目结构
 ```
 src/main/java/com/example/qacommunity/
 ├── common/          # 通用类（Result, ResultCode, PageResult）
-├── config/          # 配置类（JwtConfig）
-├── controller/      # 控制器（User, Question, Answer, Comment, Moderation）
-├── entity/          # 实体类（User, Question, Answer, Comment）
+├── config/          # 配置类（JwtConfig, SchedulerConfig）
+├── controller/      # 控制器（User, Question, Answer, Comment, Moderation, HotRank）
+├── entity/          # 实体类（User, Question, Answer, Comment, QuestionHot）
 ├── exception/       # 异常处理
 ├── mapper/          # MyBatis Mapper接口
 ├── service/         # 业务逻辑接口及实现
 ├── util/            # 工具类（JwtUtil）
-└── vo/              # 视图对象（QuestionVO, AnswerVO, CommentVO）
+└── vo/              # 视图对象（QuestionVO, AnswerVO, CommentVO, HotQuestionVO）
 ```
 
 ## 待完成功能
-- [ ] Day 5 - 热榜排序与定时任务
 - [ ] Day 6 - Redis缓存优化
 - [ ] Day 7 - Elasticsearch搜索（可选）
 
@@ -108,3 +116,4 @@ src/main/java/com/example/qacommunity/
 - Apifox/Postman 测试时注意区分**路径参数**和 **Query 参数**
 - 例如 `/api/comment/list/{answerId}` 中 `{answerId}` 是路径参数
 - 认证接口需要在请求头中添加 `Authorization: Bearer <token>`
+- 热榜功能首次使用需先调用 `/api/rank/refresh` 初始化数据
