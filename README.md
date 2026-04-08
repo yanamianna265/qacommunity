@@ -7,6 +7,7 @@
 - Spring Boot 4.0.3
 - MyBatis
 - MySQL 8.0+
+- Redis（缓存）
 - JWT 认证
 - Lombok
 - Maven
@@ -15,6 +16,7 @@
 ## 环境准备
 - JDK 17+
 - MySQL 8.0+
+- Redis 6.0+
 - Maven 3.6+
 
 ## 初始化数据库
@@ -23,13 +25,25 @@ mysql -u root -p qa_community < doc/db_design/schema.sql
 ```
 
 ## 配置
-编辑 `src/main/resources/application.yml`，修改数据库连接信息：
+编辑 `src/main/resources/application.yml`：
+
+### 数据库配置
 ```yaml
 spring:
   datasource:
     url: jdbc:mysql://localhost:3306/qa_community?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true&characterEncoding=utf8
     username: root
     password: your_mysql_password
+```
+
+### Redis配置
+```yaml
+spring:
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      database: 0
 ```
 
 ## 运行项目
@@ -76,6 +90,13 @@ mvn spring-boot:run
 - ✅ 实现定时任务每小时自动更新热榜
 - ✅ 提供手动刷新热榜接口
 
+### Day 6 - Redis缓存优化
+- ✅ 集成 Spring Data Redis
+- ✅ 实现缓存服务（CacheService）
+- ✅ 热榜列表添加 Redis 缓存（5分钟过期）
+- ✅ 手动刷新时清除旧缓存
+- ✅ 降低数据库 QPS，提升接口响应速度
+
 ## 接口列表
 
 | 接口 | 方法 | 说明 | 认证 |
@@ -91,25 +112,43 @@ mvn spring-boot:run
 | `/api/comment` | POST | 发布评论 | 是 |
 | `/api/comment/list/{answerId}` | GET | 评论列表（分页） | 否 |
 | `/api/moderation/check` | POST | 敏感词检测 | 否 |
-| `/api/rank/hot` | GET | 获取热榜列表 | 否 |
+| `/api/rank/hot` | GET | 获取热榜列表（缓存5分钟） | 否 |
 | `/api/rank/refresh` | POST | 手动刷新热榜 | 否 |
 
 ## 项目结构
 ```
 src/main/java/com/example/qacommunity/
 ├── common/          # 通用类（Result, ResultCode, PageResult）
-├── config/          # 配置类（JwtConfig, SchedulerConfig）
+├── config/          # 配置类（JwtConfig, SchedulerConfig, RedisConfig）
 ├── controller/      # 控制器（User, Question, Answer, Comment, Moderation, HotRank）
 ├── entity/          # 实体类（User, Question, Answer, Comment, QuestionHot）
 ├── exception/       # 异常处理
 ├── mapper/          # MyBatis Mapper接口
-├── service/         # 业务逻辑接口及实现
+├── service/         # 业务逻辑接口及实现（包含缓存服务）
 ├── util/            # 工具类（JwtUtil）
 └── vo/              # 视图对象（QuestionVO, AnswerVO, CommentVO, HotQuestionVO）
 ```
 
+## 热榜功能说明
+
+### 热度计算公式
+```
+热度分数 = 回答数 × 0.4 + 时间衰减因子
+
+时间衰减 = log(发布时间距今小时数 + 1) × 0.1
+```
+
+### 缓存策略
+| 数据 | 缓存 Key | 过期时间 |
+|------|----------|----------|
+| 热榜列表 | `rank:hot:list:{limit}` | 5分钟 |
+
+### 使用流程
+1. 首次使用需先发布问题
+2. 调用 `/api/rank/refresh` 初始化热榜数据
+3. 调用 `/api/rank/hot` 查看热榜
+
 ## 待完成功能
-- [ ] Day 6 - Redis缓存优化
 - [ ] Day 7 - Elasticsearch搜索（可选）
 
 ## 注意事项
@@ -117,3 +156,4 @@ src/main/java/com/example/qacommunity/
 - 例如 `/api/comment/list/{answerId}` 中 `{answerId}` 是路径参数
 - 认证接口需要在请求头中添加 `Authorization: Bearer <token>`
 - 热榜功能首次使用需先调用 `/api/rank/refresh` 初始化数据
+- Redis 必须先启动才能使用缓存功能

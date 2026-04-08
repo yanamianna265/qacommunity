@@ -19,4 +19,8 @@ public interface QuestionMapper {
     List<QuestionVO> selectByTag(@Param("tag") String tag, @Param("offset") Integer offset, @Param("limit") Integer limit);
     
     Long countByTag(@Param("tag") String tag);
+    
+    List<Question> selectAll();
+    
+    Long countByQuestionId(@Param("questionId") Integer questionId);
 }

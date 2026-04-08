@@ -56,4 +56,12 @@
         SELECT COUNT(*) FROM question WHERE tag = #{tag}
     </select>
 
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT * FROM question ORDER BY created_at DESC
+    </select>
+
+    <select id="countByQuestionId" resultType="long">
+        SELECT COUNT(*) FROM answer WHERE question_id = #{questionId}
+    </select>
+
 </mapper>

@@ -3,6 +3,8 @@ package com.example.qacommunity.service.impl;
 import com.example.qacommunity.service.CacheService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -15,7 +17,13 @@ public class CacheServiceImpl implements CacheService {
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper;
+
+    public CacheServiceImpl() {
+        objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+    }
 
     @Override
     public void set(String key, Object value, long expireSeconds) {

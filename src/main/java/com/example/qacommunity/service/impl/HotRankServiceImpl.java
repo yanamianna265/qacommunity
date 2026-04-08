@@ -34,14 +34,15 @@ public class HotRankServiceImpl implements HotRankService {
 
     @Override
     public void calculateAndUpdateHotScores() {
-        List<HotQuestionVO> hotList = questionHotMapper.selectHotList(1000);
+        List<Question> allQuestions = questionMapper.selectAll();
         
-        for (HotQuestionVO hotQuestion : hotList) {
-            Double hotScore = calculateHotScore(hotQuestion.getQuestionId());
-            questionHotMapper.insertOrUpdate(hotQuestion.getQuestionId(), hotScore, hotQuestion.getAnswerCount(), 0);
+        for (Question question : allQuestions) {
+            Double hotScore = calculateHotScore(question.getQuestionId());
+            Long answerCount = questionMapper.countByQuestionId(question.getQuestionId());
+            questionHotMapper.insertOrUpdate(question.getQuestionId(), hotScore, answerCount.intValue(), 0);
         }
         
-        cacheService.delete(HOT_LIST_KEY);
+        cacheService.delete(HOT_LIST_KEY + ":*");
     }
 
     @Override
